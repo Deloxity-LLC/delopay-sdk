@@ -9,6 +9,20 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $spec = Join-Path $repoRoot $SpecPath
+$generatedReadmePlaceholder = @(
+  "Generated code is written here by ``scripts/generate-all.ps1``."
+  ""
+  "This placeholder exists so smoke tests can verify directory presence before first generation."
+) -join [Environment]::NewLine
+
+function Set-GeneratedReadmePlaceholder {
+  param(
+    [string]$OutputDirectory
+  )
+
+  Set-Content -Path (Join-Path $OutputDirectory "README.md") -Value $generatedReadmePlaceholder
+}
+
 if (-not (Test-Path $spec)) {
   throw "Spec file not found: $spec"
 }
@@ -29,14 +43,16 @@ function Invoke-Generator {
     Remove-Item -Recurse -Force $output
   }
   New-Item -ItemType Directory -Force -Path $output | Out-Null
+  Set-GeneratedReadmePlaceholder -OutputDirectory $output
 
   Write-Host "Generating $Generator SDK to $OutputPath"
-  & npx --yes @openapitools/openapi-generator-cli@2.16.0 generate `
+  & npx --no-install openapi-generator-cli generate `
     -i $spec `
     -g $Generator `
     -c $config `
     -o $output `
-    --global-property apiDocs=false,modelDocs=false
+    --global-property apiDocs=false,modelDocs=false `
+    --skip-overwrite
 
   if ($LASTEXITCODE -ne 0) {
     throw "OpenAPI generation failed for $Generator"
