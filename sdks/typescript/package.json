@@ -1,4 +1,4 @@
-﻿{
+{
     "name":  "@delopay/sdk",
     "version":  "0.1.0",
     "description":  "Official DeloPay TypeScript SDK",
@@ -24,7 +24,7 @@
                     "typecheck":  "tsc --noEmit"
                 },
     "devDependencies":  {
-                            "@types/node":  "^24.3.1",
+                            "@types/node":  "^25.2.3",
                             "@typescript-eslint/eslint-plugin":  "^8.43.0",
                             "@typescript-eslint/parser":  "^8.43.0",
                             "eslint":  "^8.57.1",
