@@ -182,7 +182,9 @@ class ProviderListResponse:
     @staticmethod
     def from_dict(raw: dict[str, Any]) -> "ProviderListResponse":
         return ProviderListResponse(
-            providers=[ProviderInfo.from_dict(item) for item in raw.get("providers") or []]
+            providers=[
+                ProviderInfo.from_dict(item) for item in raw.get("providers") or []
+            ]
         )
 
 

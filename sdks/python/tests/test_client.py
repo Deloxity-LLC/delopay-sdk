@@ -11,7 +11,9 @@ from delopay import ApiError, CreatePaymentRequest, DelopayClient
 
 
 class FakeResponse:
-    def __init__(self, status: int, payload: dict | None = None, headers: dict | None = None) -> None:
+    def __init__(
+        self, status: int, payload: dict | None = None, headers: dict | None = None
+    ) -> None:
         self.status = status
         self._payload = payload
         self.headers = headers or {}
@@ -75,7 +77,9 @@ def test_retry_for_get_only(monkeypatch):
 
     monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
 
-    client = DelopayClient(api_key="api_key", base_url="https://api.example.com", max_retries=2)
+    client = DelopayClient(
+        api_key="api_key", base_url="https://api.example.com", max_retries=2
+    )
     client.payments.get("pay_1")
 
     assert calls["count"] == 2
@@ -90,7 +94,9 @@ def test_no_retry_for_post(monkeypatch):
 
     monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
 
-    client = DelopayClient(api_key="api_key", base_url="https://api.example.com", max_retries=2)
+    client = DelopayClient(
+        api_key="api_key", base_url="https://api.example.com", max_retries=2
+    )
 
     with pytest.raises(ApiError) as exc:
         client.payments.create(

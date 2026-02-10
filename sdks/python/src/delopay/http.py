@@ -50,7 +50,9 @@ class HttpClient:
                 message = exc.msg or "Request failed"
 
                 if isinstance(parsed, dict):
-                    message = str(parsed.get("message") or parsed.get("error") or message)
+                    message = str(
+                        parsed.get("message") or parsed.get("error") or message
+                    )
                     code = parsed.get("code") or parsed.get("errorCode")
                     request_id = request_id or parsed.get("requestId")
 
@@ -70,7 +72,9 @@ class HttpClient:
                     _sleep(attempt)
                     continue
 
-                raise ApiError(status=0, message="Network request failed", raw=str(exc.reason)) from exc
+                raise ApiError(
+                    status=0, message="Network request failed", raw=str(exc.reason)
+                ) from exc
 
         raise ApiError(status=0, message="Request exhausted retries")
 
