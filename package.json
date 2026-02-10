@@ -1,0 +1,19 @@
+﻿{
+    "name":  "delopay-sdk",
+    "version":  "0.1.0",
+    "private":  true,
+    "description":  "DeloPay multi-language SDK monorepo",
+    "workspaces":  [
+                       "sdks/typescript"
+                   ],
+    "scripts":  {
+                    "sync:openapi":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/sync-openapi.ps1",
+                    "generate":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-all.ps1",
+                    "build":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-all.ps1",
+                    "test":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-all.ps1",
+                    "check":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/check-all.ps1"
+                },
+    "devDependencies":  {
+                            "@openapitools/openapi-generator-cli":  "^2.16.0"
+                        }
+}

@@ -1,0 +1,27 @@
+# Node
+node_modules/
+.npm/
+
+# OpenAPI generator caches
+.openapi-generator/
+
+# Build artifacts
+**/dist/
+**/build/
+**/out/
+
+# Java/Gradle
+**/.gradle/
+
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/*.egg-info/
+*.pyc
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

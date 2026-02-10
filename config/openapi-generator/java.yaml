@@ -1,0 +1,10 @@
+﻿groupId: "io.delopay.generated"
+artifactId: "delopay-generated"
+artifactVersion: "0.1.0"
+invokerPackage: "io.delopay.generated.invoker"
+apiPackage: "io.delopay.generated.api"
+modelPackage: "io.delopay.generated.model"
+dateLibrary: "java8"
+useSingleRequestParameter: true
+hideGenerationTimestamp: true
+
