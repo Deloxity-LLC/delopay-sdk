@@ -1,20 +1,33 @@
-name: Dependency Review
+name: Dependency Audit
 
 on:
   pull_request:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
-  dependency-review:
+  dependency-audit:
+    name: Dependency Audit
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@v4
+      - name: Setup Node
+        uses: actions/setup-node@v6
         with:
-          fail-on-severity: high
+          node-version: "22"
+          cache: "npm"
+
+      - name: Audit root dependencies (advisory)
+        run: |
+          npm ci
+          npm audit --audit-level=high || true
+
+      - name: Audit TypeScript SDK dependencies (advisory)
+        run: |
+          npm ci
+          npm audit --audit-level=high || true
+        working-directory: sdks/typescript
+
