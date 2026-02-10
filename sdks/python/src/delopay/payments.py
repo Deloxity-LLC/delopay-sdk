@@ -30,16 +30,24 @@ class PaymentsClient:
         raw = self._http.request("GET", f"/api/payments/by-order/{client_order_id}")
         return PaymentResponse.from_dict(raw or {})
 
-    def update(self, payment_id: str, request: UpdatePaymentRequest | dict[str, Any]) -> PaymentResponse:
-        raw = self._http.request("PUT", f"/api/payments/{payment_id}", _to_payload(request))
+    def update(
+        self, payment_id: str, request: UpdatePaymentRequest | dict[str, Any]
+    ) -> PaymentResponse:
+        raw = self._http.request(
+            "PUT", f"/api/payments/{payment_id}", _to_payload(request)
+        )
         return PaymentResponse.from_dict(raw or {})
 
     def capture(self, payment_id: str) -> PaymentResponse:
         raw = self._http.request("POST", f"/api/payments/{payment_id}/capture")
         return PaymentResponse.from_dict(raw or {})
 
-    def refund(self, payment_id: str, request: RefundPaymentRequest | dict[str, Any]) -> RefundResponse:
-        raw = self._http.request("POST", f"/api/payments/{payment_id}/refund", _to_payload(request))
+    def refund(
+        self, payment_id: str, request: RefundPaymentRequest | dict[str, Any]
+    ) -> RefundResponse:
+        raw = self._http.request(
+            "POST", f"/api/payments/{payment_id}/refund", _to_payload(request)
+        )
         return RefundResponse.from_dict(raw or {})
 
     def resend_failed_callbacks(self) -> ResendCallbacksResponse:
@@ -54,7 +62,7 @@ def _to_payload(value: Any) -> dict[str, Any]:
     if hasattr(value, "to_payload"):
         return value.to_payload()
 
-    if is_dataclass(value):
+    if is_dataclass(value) and not isinstance(value, type):
         return asdict(value)
 
     raise TypeError("Unsupported payload type")
