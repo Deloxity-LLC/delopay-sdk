@@ -1,0 +1,29 @@
+﻿{
+    "name":  "@delopay/sdk",
+    "version":  "0.1.0",
+    "description":  "Official DeloPay TypeScript SDK",
+    "type":  "module",
+    "main":  "dist/index.cjs",
+    "module":  "dist/index.js",
+    "types":  "dist/index.d.ts",
+    "files":  [
+                  "dist",
+                  "generated"
+              ],
+    "exports":  {
+                    ".":  {
+                              "types":  "./dist/index.d.ts",
+                              "import":  "./dist/index.js",
+                              "require":  "./dist/index.cjs"
+                          }
+                },
+    "scripts":  {
+                    "build":  "tsup",
+                    "test":  "vitest run"
+                },
+    "devDependencies":  {
+                            "tsup":  "^8.5.0",
+                            "typescript":  "^5.9.2",
+                            "vitest":  "^3.2.4"
+                        }
+}

@@ -1,0 +1,92 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+    id "signing"
+}
+
+group = project.findProperty("GROUP")
+version = project.findProperty("VERSION_NAME")
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.17.2"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.2"
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.11.3"
+    testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "io.delopay"
+            artifactId = "delopay-java"
+            version = project.version
+
+            from components.java
+
+            pom {
+                name = "delopay-java"
+                description = "Official DeloPay Java SDK"
+                url = "https://github.com/Deloxity-LLC/delopay-sdk"
+                licenses {
+                    license {
+                        name = "Proprietary"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "delopay"
+                        name = "DeloPay"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/Deloxity-LLC/delopay-sdk.git"
+                    developerConnection = "scm:git:ssh://git@github.com/Deloxity-LLC/delopay-sdk.git"
+                    url = "https://github.com/Deloxity-LLC/delopay-sdk"
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            def snapshotsUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            def releasesUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            url = version.toString().endsWith("SNAPSHOT") ? snapshotsUrl : releasesUrl
+
+            credentials {
+                username = System.getenv("MAVEN_CENTRAL_USERNAME")
+                password = System.getenv("MAVEN_CENTRAL_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    def signingKey = System.getenv("MAVEN_GPG_PRIVATE_KEY")
+    def signingPassword = System.getenv("MAVEN_GPG_PASSPHRASE")
+
+    required { signingKey != null && signingPassword != null }
+
+    if (signingKey != null && signingPassword != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.mavenJava
+    }
+}
