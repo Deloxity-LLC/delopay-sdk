@@ -150,7 +150,7 @@ class TestProvidersGetClientConfig:
         assert result.publishable_key is None
 
     def test_get_config_with_special_chars(self, monkeypatch):
-        """Test getting config with special characters (handled by client)."""
+        """Test URL encoding when provider ID contains special characters."""
         captured = {}
 
         def fake_urlopen(request, timeout=0):
@@ -160,9 +160,12 @@ class TestProvidersGetClientConfig:
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
 
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
-        client.providers.get_client_config("stripe")
+        client.providers.get_client_config("provider/test#1")
 
-        assert "stripe" in captured["url"]
+        assert (
+            captured["url"]
+            == "https://api.test.com/api/providers/provider%2Ftest%231/client-config"
+        )
 
     def test_get_config_unknown_provider(self, monkeypatch):
         """Test handling unknown provider."""

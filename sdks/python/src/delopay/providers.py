@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from .http import HttpClient
 from .models import PaymentMethodsResponse, ProviderClientConfig, ProviderListResponse
 
@@ -13,7 +15,9 @@ class ProvidersClient:
         return ProviderListResponse.from_dict(raw or {})
 
     def get_client_config(self, provider_id: str) -> ProviderClientConfig:
-        raw = self._http.request("GET", f"/api/providers/{provider_id}/client-config")
+        raw = self._http.request(
+            "GET", f"/api/providers/{quote(provider_id, safe='')}/client-config"
+        )
         return ProviderClientConfig.from_dict(raw or {})
 
     def get_stripe_payment_methods(

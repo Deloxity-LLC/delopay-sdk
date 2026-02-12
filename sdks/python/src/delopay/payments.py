@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
 from typing import Any
+from urllib.parse import quote
 
 from .http import HttpClient
 from .models import (
@@ -23,30 +24,36 @@ class PaymentsClient:
         return PaymentResponse.from_dict(raw or {})
 
     def get(self, payment_id: str) -> PaymentResponse:
-        raw = self._http.request("GET", f"/api/payments/{payment_id}")
+        raw = self._http.request("GET", f"/api/payments/{quote(payment_id, safe='')}")
         return PaymentResponse.from_dict(raw or {})
 
     def get_by_order(self, client_order_id: str) -> PaymentResponse:
-        raw = self._http.request("GET", f"/api/payments/by-order/{client_order_id}")
+        raw = self._http.request(
+            "GET", f"/api/payments/by-order/{quote(client_order_id, safe='')}"
+        )
         return PaymentResponse.from_dict(raw or {})
 
     def update(
         self, payment_id: str, request: UpdatePaymentRequest | dict[str, Any]
     ) -> PaymentResponse:
         raw = self._http.request(
-            "PUT", f"/api/payments/{payment_id}", _to_payload(request)
+            "PUT", f"/api/payments/{quote(payment_id, safe='')}", _to_payload(request)
         )
         return PaymentResponse.from_dict(raw or {})
 
     def capture(self, payment_id: str) -> PaymentResponse:
-        raw = self._http.request("POST", f"/api/payments/{payment_id}/capture")
+        raw = self._http.request(
+            "POST", f"/api/payments/{quote(payment_id, safe='')}/capture"
+        )
         return PaymentResponse.from_dict(raw or {})
 
     def refund(
         self, payment_id: str, request: RefundPaymentRequest | dict[str, Any]
     ) -> RefundResponse:
         raw = self._http.request(
-            "POST", f"/api/payments/{payment_id}/refund", _to_payload(request)
+            "POST",
+            f"/api/payments/{quote(payment_id, safe='')}/refund",
+            _to_payload(request),
         )
         return RefundResponse.from_dict(raw or {})
 

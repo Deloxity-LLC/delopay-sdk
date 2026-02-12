@@ -117,7 +117,7 @@ class PaymentsClientTest {
         RecordedRequest recordedRequest = server.takeRequest();
         String body = recordedRequest.getBody().readUtf8();
         // autoCapture is included with default value
-assertTrue(body.contains("\"autoCapture\":false"));
+        assertTrue(body.contains("\"autoCapture\":false"));
     }
 
     @Test
@@ -194,9 +194,7 @@ assertTrue(body.contains("\"autoCapture\":false"));
         client.payments().get("pay test/id");
 
         RecordedRequest request = server.takeRequest();
-        // Java URL encoding uses '+' for spaces in some contexts
-assertTrue(request.getPath().contains("pay"));
-assertTrue(request.getPath().contains("test"));
+        assertEquals("/api/payments/pay+test%2Fid", request.getPath());
     }
 
     @Test
@@ -356,8 +354,8 @@ assertTrue(request.getPath().contains("test"));
         assertEquals(new BigDecimal("50.00"), response.amount());
         assertEquals(new BigDecimal("50.00"), response.remainingAmount());
         // Note: Java may parse datetime without seconds
-assertNotNull(response.completedAt());
-assertTrue(response.completedAt().toString().contains("2026-02-12T12:05"));
+        assertNotNull(response.completedAt());
+        assertTrue(response.completedAt().toString().contains("2026-02-12T12:05"));
     }
 
     @Test

@@ -219,7 +219,7 @@ class TestPaymentsGet:
         assert exc.value.code == "E_NOT_FOUND"
 
     def test_get_payment_with_special_chars(self, monkeypatch):
-        """Test getting a payment with special characters in ID (handled by client)."""
+        """Test getting a payment with special characters in ID."""
         captured = {}
 
         def fake_urlopen(request, timeout=0):
@@ -229,9 +229,9 @@ class TestPaymentsGet:
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
 
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
-        client.payments.get("pay_special_id")
+        client.payments.get("pay test/id")
 
-        assert "pay_special_id" in captured["url"]
+        assert captured["url"] == "https://api.test.com/api/payments/pay%20test%2Fid"
 
 
 class TestPaymentsGetByOrder:
@@ -255,6 +255,25 @@ class TestPaymentsGetByOrder:
 
         assert captured["url"] == "https://api.test.com/api/payments/by-order/my_custom_order_123"
         assert result.client_order_id == "my_custom_order_123"
+
+    def test_get_payment_by_order_id_with_special_chars(self, monkeypatch):
+        """Test URL encoding when order ID contains special characters."""
+        captured = {}
+
+        def fake_urlopen(request, timeout=0):
+            captured["url"] = request.full_url
+            return FakeResponse(
+                200,
+                create_payment_response("pay_by_order_encoded", clientOrderId="order#123/test"),
+            )
+
+        monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
+
+        client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
+        result = client.payments.get_by_order("order#123/test")
+
+        assert captured["url"] == "https://api.test.com/api/payments/by-order/order%23123%2Ftest"
+        assert result.client_order_id == "order#123/test"
 
 
 class TestPaymentsUpdate:
