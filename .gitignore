@@ -12,6 +12,8 @@ node_modules/
 
 # Java/Gradle
 **/.gradle/
+sdks/java/bin/
+**/*.class
 
 # Python
 **/.venv/
