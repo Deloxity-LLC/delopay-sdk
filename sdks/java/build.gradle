@@ -84,7 +84,7 @@ signing {
     def signingKey = System.getenv("MAVEN_GPG_PRIVATE_KEY")
     def signingPassword = System.getenv("MAVEN_GPG_PASSPHRASE")
 
-    required { signingKey != null && signingPassword != null }
+    required = signingKey != null && signingPassword != null
 
     if (signingKey != null && signingPassword != null) {
         useInMemoryPgpKeys(signingKey, signingPassword)
