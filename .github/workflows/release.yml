@@ -6,6 +6,11 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -57,6 +62,9 @@ jobs:
       - name: Test all SDKs
         run: npm run test
 
+      - name: Pack TypeScript SDK artifact
+        run: npm pack ./sdks/typescript --pack-destination ./sdks/typescript
+
       - name: Publish TypeScript SDK to npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -103,3 +111,38 @@ jobs:
           fi
           python -m twine upload ./sdks/python/dist/*
 
+      - name: Generate artifact checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          find ./sdks/typescript -maxdepth 1 -type f -name '*.tgz' -print0 | xargs -0 -r sha256sum > checksums-typescript.sha256
+          find ./sdks/java/build/libs -maxdepth 1 -type f -name '*.jar' -print0 | xargs -0 -r sha256sum > checksums-java.sha256
+          find ./sdks/python/dist -maxdepth 1 -type f \\( -name '*.whl' -o -name '*.tar.gz' \\) -print0 | xargs -0 -r sha256sum > checksums-python.sha256
+
+      - name: Upload checksum artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-checksums
+          path: |
+            checksums-typescript.sha256
+            checksums-java.sha256
+            checksums-python.sha256
+          retention-days: 30
+
+      - name: Attest TypeScript build provenance
+        if: ${{ hashFiles('sdks/typescript/*.tgz') != '' }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: sdks/typescript/*.tgz
+
+      - name: Attest Java build provenance
+        if: ${{ hashFiles('sdks/java/build/libs/*.jar') != '' }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: sdks/java/build/libs/*.jar
+
+      - name: Attest Python build provenance
+        if: ${{ hashFiles('sdks/python/dist/*') != '' }}
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: sdks/python/dist/*

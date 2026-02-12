@@ -3,7 +3,6 @@ name: Security
 on:
   push:
     branches:
-      - main
       - dev
   pull_request:
   schedule:
@@ -15,8 +14,28 @@ permissions:
   security-events: write
 
 jobs:
-  codeql:
-    name: CodeQL (${{ matrix.language }})
+  sast-semgrep:
+    name: SAST (Semgrep)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run Semgrep (OWASP + Security Audit)
+        run: |
+          docker run --rm -v "$PWD:/src" returntocorp/semgrep:latest \
+            semgrep scan \
+            --config p/owasp-top-ten \
+            --config p/security-audit \
+            --error \
+            --exclude .git \
+            --exclude node_modules \
+            --exclude dist \
+            --exclude generated \
+            /src
+
+  sast-codeql:
+    name: SAST (CodeQL ${{ matrix.language }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -46,27 +65,85 @@ jobs:
         if: matrix.language == 'java-kotlin'
         run: chmod +x ./sdks/java/gradlew
 
-      - name: Autobuild (non-Java)
-        if: matrix.language != 'java-kotlin'
-        uses: github/codeql-action/autobuild@v4
-
-      - name: Build Java sources
+      - name: Build Java classes
         if: matrix.language == 'java-kotlin'
         run: ./sdks/java/gradlew -p ./sdks/java classes --no-daemon
+
+      - name: Autobuild non-Java
+        if: matrix.language != 'java-kotlin'
+        uses: github/codeql-action/autobuild@v4
 
       - name: Analyze
         uses: github/codeql-action/analyze@v4
 
-  secret-scan:
-    name: Secret Scan (TruffleHog)
+  sca-trivy-fs:
+    name: SCA (Trivy FS)
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
 
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.31.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+  secrets-gitleaks:
+    name: Secrets (Gitleaks)
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Run TruffleHog
-        run: docker run --rm -v "$PWD:/repo" trufflesecurity/trufflehog:latest filesystem /repo --only-verified --fail
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  sbom-cyclonedx:
+    name: SBOM (CycloneDX)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: cyclonedx-json
+          output-file: sbom.cdx.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx-sdk
+          path: sbom.cdx.json
+          retention-days: 14
+
+  lockfile-integrity:
+    name: Dependency lockfile integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Verify deterministic root install
+        run: npm ci --ignore-scripts
+
+      - name: Ensure lockfile unchanged
+        run: git diff --exit-code -- package-lock.json

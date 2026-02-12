@@ -1,0 +1,48 @@
+name: DAST ZAP Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Target URL to scan (staging/sandbox)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  zap-baseline:
+    name: ZAP Baseline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ZAP baseline scan
+        env:
+          TARGET_URL: ${{ github.event.inputs.target_url }}
+        run: |
+          if [ -z "$TARGET_URL" ]; then
+            echo "target_url input is required"
+            exit 1
+          fi
+
+          docker run --rm \
+            -v "$PWD:/zap/wrk" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t "$TARGET_URL" \
+              -r zap-report.html \
+              -J zap-report.json \
+              -m 5 \
+              -I
+
+      - name: Upload ZAP report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: |
+            zap-report.html
+            zap-report.json
+          retention-days: 14
