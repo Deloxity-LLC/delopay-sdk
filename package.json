@@ -11,7 +11,9 @@
                     "generate":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/generate-all.ps1",
                     "build":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-all.ps1",
                     "test":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/test-all.ps1",
-                    "check":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/check-all.ps1"
+                    "check":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/check-all.ps1",
+                    "test:smoke":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/smoke-staging.ps1",
+                    "test:canary":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/canary-check.ps1"
                 },
     "devDependencies":  {
                             "@openapitools/openapi-generator-cli":  "^2.16.0"

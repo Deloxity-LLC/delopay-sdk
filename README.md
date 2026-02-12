@@ -38,6 +38,44 @@ npm run build
 npm run test
 ```
 
+## Staging Smoke And Canary
+
+If you want stronger confidence with real API traffic (not only mocked tests), use:
+
+- integration smoke checks against staging/sandbox
+- real special-character path checks (`paymentId`, `clientOrderId`, `providerId`)
+- short post-deploy canary checks with 4xx/5xx tracking
+
+Required:
+
+- API key with staging/sandbox access
+- reachable base URL (default: `https://sandbox-delopay.deloxity.com`)
+
+Local usage:
+
+```powershell
+$env:DELOPAY_STAGING_API_KEY = "..."
+$env:DELOPAY_BASE_URL = "https://sandbox-delopay.deloxity.com"
+
+npm run test:smoke
+npm run test:canary
+```
+
+Useful canary options:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/canary-check.ps1 `
+  -Iterations 5 `
+  -IntervalSeconds 15 `
+  -Max4xxRate 0.00 `
+  -Max5xxRate 0.00
+```
+
+GitHub Actions:
+
+- workflow: `Staging Smoke & Canary` (`.github/workflows/staging-smoke-canary.yml`)
+- required repository secret: `DELOPAY_STAGING_API_KEY`
+
 ## Versioning
 
 - Shared version is stored in `VERSION`.
