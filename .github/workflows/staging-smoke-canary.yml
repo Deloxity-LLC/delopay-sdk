@@ -22,7 +22,6 @@ permissions:
 jobs:
   smoke_and_canary:
     name: Smoke + Canary
-    if: ${{ secrets.DELOPAY_STAGING_API_KEY != '' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -32,11 +31,17 @@ jobs:
       - name: Run staging smoke and canary checks
         shell: pwsh
         env:
-          DELOPAY_BASE_URL: ${{ github.event.inputs.base_url || 'https://sandbox-delopay.deloxity.com' }}
+          DELOPAY_BASE_URL: ${{ github.event.inputs.base_url }}
           DELOPAY_STAGING_API_KEY: ${{ secrets.DELOPAY_STAGING_API_KEY }}
-          CANARY_ITERATIONS: ${{ github.event.inputs.iterations || '5' }}
-          CANARY_INTERVAL_SECONDS: ${{ github.event.inputs.interval_seconds || '15' }}
+          CANARY_ITERATIONS: ${{ github.event.inputs.iterations }}
+          CANARY_INTERVAL_SECONDS: ${{ github.event.inputs.interval_seconds }}
         run: |
+          if ([string]::IsNullOrWhiteSpace("$env:DELOPAY_STAGING_API_KEY")) {
+            Write-Host "Skipping staging smoke/canary checks."
+            Write-Host "Set repository secret DELOPAY_STAGING_API_KEY and run this workflow again."
+            exit 0
+          }
+
           ./scripts/smoke-staging.ps1 `
             -BaseUrl "$env:DELOPAY_BASE_URL" `
             -ApiKey "$env:DELOPAY_STAGING_API_KEY"
@@ -46,14 +51,3 @@ jobs:
             -ApiKey "$env:DELOPAY_STAGING_API_KEY" `
             -Iterations ([int]$env:CANARY_ITERATIONS) `
             -IntervalSeconds ([int]$env:CANARY_INTERVAL_SECONDS)
-
-  missing_secret_notice:
-    name: Missing Staging Secret
-    if: ${{ secrets.DELOPAY_STAGING_API_KEY == '' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Explain missing configuration
-        run: |
-          echo "Skipping staging smoke/canary checks."
-          echo "Set repository secret DELOPAY_STAGING_API_KEY and run this workflow again."
