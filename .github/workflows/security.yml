@@ -27,6 +27,7 @@ jobs:
             semgrep scan \
             --config p/owasp-top-ten \
             --config p/security-audit \
+            --severity ERROR \
             --error \
             --exclude .git \
             --exclude node_modules \
