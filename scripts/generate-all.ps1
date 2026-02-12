@@ -46,7 +46,7 @@ function Invoke-Generator {
   Set-GeneratedReadmePlaceholder -OutputDirectory $output
 
   Write-Host "Generating $Generator SDK to $OutputPath"
-  & npx --no-install openapi-generator-cli generate `
+  npx --no-install @openapitools/openapi-generator-cli generate `
     -i $spec `
     -g $Generator `
     -c $config `

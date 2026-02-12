@@ -1,4 +1,5 @@
 """Comprehensive tests for ProvidersClient."""
+
 from __future__ import annotations
 
 import json
@@ -123,7 +124,9 @@ class TestProvidersGetClientConfig:
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
         result = client.providers.get_client_config("stripe")
 
-        assert captured["url"] == "https://api.test.com/api/providers/stripe/client-config"
+        assert (
+            captured["url"] == "https://api.test.com/api/providers/stripe/client-config"
+        )
         assert result.provider == "STRIPE"
         assert result.publishable_key == "pk_test_1234567890"
 
@@ -177,7 +180,9 @@ class TestProvidersGetClientConfig:
                 code=400,
                 msg="Bad Request",
                 hdrs={},
-                fp=io.BytesIO(b'{"message":"Unknown provider","code":"E_UNKNOWN_PROVIDER"}'),
+                fp=io.BytesIO(
+                    b'{"message":"Unknown provider","code":"E_UNKNOWN_PROVIDER"}'
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -210,7 +215,11 @@ class TestProvidersStripePaymentMethods:
                     "currency": "EUR",
                     "paymentMethods": [
                         {"type": "card", "name": "Credit Card", "icon": "card.png"},
-                        {"type": "sepa_debit", "name": "SEPA Direct Debit", "icon": "sepa.png"},
+                        {
+                            "type": "sepa_debit",
+                            "name": "SEPA Direct Debit",
+                            "icon": "sepa.png",
+                        },
                         {"type": "ideal", "name": "iDEAL", "icon": "ideal.png"},
                         {"type": "giropay", "name": "giropay", "icon": "giropay.png"},
                     ],
@@ -249,7 +258,11 @@ class TestProvidersStripePaymentMethods:
                     "currency": None,
                     "paymentMethods": [
                         {"type": "card", "name": "Credit Card", "icon": "card.png"},
-                        {"type": "ach_debit", "name": "ACH Direct Debit", "icon": "ach.png"},
+                        {
+                            "type": "ach_debit",
+                            "name": "ACH Direct Debit",
+                            "icon": "ach.png",
+                        },
                     ],
                 },
             )
@@ -277,7 +290,9 @@ class TestProvidersStripePaymentMethods:
                 code=400,
                 msg="Bad Request",
                 hdrs={},
-                fp=io.BytesIO(b'{"message":"Invalid country code","code":"E_INVALID_COUNTRY"}'),
+                fp=io.BytesIO(
+                    b'{"message":"Invalid country code","code":"E_INVALID_COUNTRY"}'
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)

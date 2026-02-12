@@ -1,4 +1,5 @@
 """Comprehensive tests for PaymentsClient."""
+
 from __future__ import annotations
 
 import io
@@ -14,7 +15,6 @@ from delopay import (
     RefundPaymentRequest,
     UpdatePaymentRequest,
 )
-from delopay.models import PaymentResponse, RefundResponse
 
 
 class FakeResponse:
@@ -145,7 +145,9 @@ class TestPaymentsCreate:
                 code=400,
                 msg="Bad Request",
                 hdrs={"x-request-id": "req_456"},
-                fp=io.BytesIO(b'{"message":"Invalid currency","code":"E_INVALID_CURRENCY"}'),
+                fp=io.BytesIO(
+                    b'{"message":"Invalid currency","code":"E_INVALID_CURRENCY"}'
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -245,7 +247,10 @@ class TestPaymentsGetByOrder:
             captured["url"] = request.full_url
             return FakeResponse(
                 200,
-                create_payment_response("pay_by_order", clientOrderId="my_custom_order_123"),
+                create_payment_response(
+                    "pay_by_order",
+                    clientOrderId="my_custom_order_123",
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -253,7 +258,10 @@ class TestPaymentsGetByOrder:
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
         result = client.payments.get_by_order("my_custom_order_123")
 
-        assert captured["url"] == "https://api.test.com/api/payments/by-order/my_custom_order_123"
+        assert (
+            captured["url"]
+            == "https://api.test.com/api/payments/by-order/my_custom_order_123"
+        )
         assert result.client_order_id == "my_custom_order_123"
 
     def test_get_payment_by_order_id_with_special_chars(self, monkeypatch):
@@ -264,7 +272,10 @@ class TestPaymentsGetByOrder:
             captured["url"] = request.full_url
             return FakeResponse(
                 200,
-                create_payment_response("pay_by_order_encoded", clientOrderId="order#123/test"),
+                create_payment_response(
+                    "pay_by_order_encoded",
+                    clientOrderId="order#123/test",
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -272,7 +283,10 @@ class TestPaymentsGetByOrder:
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
         result = client.payments.get_by_order("order#123/test")
 
-        assert captured["url"] == "https://api.test.com/api/payments/by-order/order%23123%2Ftest"
+        assert (
+            captured["url"]
+            == "https://api.test.com/api/payments/by-order/order%23123%2Ftest"
+        )
         assert result.client_order_id == "order#123/test"
 
 
@@ -289,7 +303,10 @@ class TestPaymentsUpdate:
             captured["body"] = json.loads(request.data) if request.data else None
             return FakeResponse(
                 200,
-                create_payment_response("pay_update", metadata={"updated": "true", "orderId": "123"}),
+                create_payment_response(
+                    "pay_update",
+                    metadata={"updated": "true", "orderId": "123"},
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -343,7 +360,10 @@ class TestPaymentsCapture:
                 code=400,
                 msg="Bad Request",
                 hdrs={},
-                fp=io.BytesIO(b'{"message":"Payment already captured","code":"E_ALREADY_CAPTURED"}'),
+                fp=io.BytesIO(
+                    b'{"message":"Payment already captured",'
+                    b'"code":"E_ALREADY_CAPTURED"}'
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -434,7 +454,10 @@ class TestPaymentsRefund:
                 code=400,
                 msg="Bad Request",
                 hdrs={},
-                fp=io.BytesIO(b'{"message":"Refund amount exceeds payment","code":"E_REFUND_EXCEEDS"}'),
+                fp=io.BytesIO(
+                    b'{"message":"Refund amount exceeds payment",'
+                    b'"code":"E_REFUND_EXCEEDS"}'
+                ),
             )
 
         monkeypatch.setattr("delopay.http.urlopen", fake_urlopen)
@@ -464,7 +487,10 @@ class TestPaymentsResendCallbacks:
         client = DelopayClient(api_key="test_key", base_url="https://api.test.com")
         result = client.payments.resend_failed_callbacks()
 
-        assert captured["url"] == "https://api.test.com/api/payments/resend-failed-callbacks"
+        assert (
+            captured["url"]
+            == "https://api.test.com/api/payments/resend-failed-callbacks"
+        )
         assert captured["method"] == "POST"
         assert result.resent == 5
 

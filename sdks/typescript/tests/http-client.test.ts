@@ -71,7 +71,7 @@ describe("HttpClient", () => {
       const clientWithTimeout = new DelopayClient({
         apiKey: "test_key",
         baseUrl: "https://api.test.com",
-        timeout: 50
+        timeoutMs: 50
       });
 
       await expect(clientWithTimeout.payments.get("pay_1")).rejects.toThrow();
