@@ -84,7 +84,7 @@ describe("ProvidersClient", () => {
     it("should get Stripe client config", async () => {
       const responseBody = {
         provider: "STRIPE",
-        publishableKey: "pk_test_1234567890",
+        publishableKey: "demo_publishable_token",
         clientId: null
       };
       fetchMock.mockResolvedValue(createMockResponse(responseBody));
@@ -96,7 +96,7 @@ describe("ProvidersClient", () => {
       expect(url).toBe("https://api.test.com/api/providers/stripe/client-config");
       
       expect(result.provider).toBe("STRIPE");
-      expect(result.publishableKey).toBe("pk_test_1234567890");
+      expect(result.publishableKey).toBe("demo_publishable_token");
     });
 
     it("should get PayPal client config", async () => {

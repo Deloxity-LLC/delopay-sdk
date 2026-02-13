@@ -88,14 +88,14 @@ class ProvidersClientTest {
                 .setHeader("Content-Type", "application/json")
                 .setBody("{" +
                         "\"provider\":\"STRIPE\"," +
-                        "\"publishableKey\":\"pk_test_1234567890\"," +
+                        "\"publishableKey\":\"demo_publishable_token\"," +
                         "\"clientId\":null}"));
 
         ProviderClientConfig response = client.providers().getClientConfig("stripe");
 
         assertNotNull(response);
         assertEquals("STRIPE", response.provider());
-        assertEquals("pk_test_1234567890", response.publishableKey());
+        assertEquals("demo_publishable_token", response.publishableKey());
 
         RecordedRequest request = server.takeRequest();
         assertEquals("/api/providers/stripe/client-config", request.getPath());

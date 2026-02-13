@@ -127,7 +127,7 @@ jobs:
         if: ${{ steps.gitleaks_license.outputs.has_license != 'true' }}
         run: |
           docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest \
-            detect --source=/repo --log-opts="--all" --redact --exit-code 1
+            detect --source=/repo --no-git --redact --exit-code 1
 
   sbom-cyclonedx:
     name: SBOM (CycloneDX)

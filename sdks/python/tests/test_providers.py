@@ -114,7 +114,7 @@ class TestProvidersGetClientConfig:
                 200,
                 {
                     "provider": "STRIPE",
-                    "publishableKey": "pk_test_1234567890",
+                    "publishableKey": "demo_publishable_token",
                     "clientId": None,
                 },
             )
@@ -128,7 +128,7 @@ class TestProvidersGetClientConfig:
             captured["url"] == "https://api.test.com/api/providers/stripe/client-config"
         )
         assert result.provider == "STRIPE"
-        assert result.publishable_key == "pk_test_1234567890"
+        assert result.publishable_key == "demo_publishable_token"
 
     def test_get_paypal_config(self, monkeypatch):
         """Test getting PayPal client config."""
