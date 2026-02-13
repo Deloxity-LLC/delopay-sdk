@@ -10,6 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   security-events: write
 
@@ -104,10 +105,29 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Gitleaks
+      - name: Detect Gitleaks license
+        id: gitleaks_license
+        run: |
+          if [ -n "${GITLEAKS_LICENSE}" ]; then
+            echo "has_license=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_license=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run Gitleaks (licensed)
+        if: ${{ steps.gitleaks_license.outputs.has_license == 'true' }}
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Run Gitleaks (OSS fallback)
+        if: ${{ steps.gitleaks_license.outputs.has_license != 'true' }}
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:latest \
+            detect --source=/repo --log-opts="--all" --redact --exit-code 1
 
   sbom-cyclonedx:
     name: SBOM (CycloneDX)
