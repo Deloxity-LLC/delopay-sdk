@@ -1,4 +1,4 @@
-﻿{
+{
     "name":  "delopay-sdk",
     "version":  "0.1.0",
     "private":  true,
@@ -16,6 +16,6 @@
                     "test:canary":  "pwsh -NoProfile -ExecutionPolicy Bypass -File ./scripts/canary-check.ps1"
                 },
     "devDependencies":  {
-                            "@openapitools/openapi-generator-cli":  "^2.16.0"
+                            "@openapitools/openapi-generator-cli":  "^2.29.0"
                         }
 }
