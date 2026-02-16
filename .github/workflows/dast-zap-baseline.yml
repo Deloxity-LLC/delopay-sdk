@@ -39,7 +39,7 @@ jobs:
               -I
 
       - name: Upload ZAP report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: zap-baseline-report
           path: |
