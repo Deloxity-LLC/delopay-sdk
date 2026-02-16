@@ -131,18 +131,18 @@ jobs:
 
       - name: Attest TypeScript build provenance
         if: ${{ hashFiles('sdks/typescript/*.tgz') != '' }}
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: sdks/typescript/*.tgz
 
       - name: Attest Java build provenance
         if: ${{ hashFiles('sdks/java/build/libs/*.jar') != '' }}
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: sdks/java/build/libs/*.jar
 
       - name: Attest Python build provenance
         if: ${{ hashFiles('sdks/python/dist/*') != '' }}
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: sdks/python/dist/*
